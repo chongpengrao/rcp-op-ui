@@ -57,8 +57,8 @@ router.beforeEach((to, from, next) => {
  * @param pageRoutes 页面路由,默认为空数组
  */
 function fnCurrentRouteIsPageRoute(route, pageRoutes = []) {
-  var temp = []
-  for (var i = 0; i < pageRoutes.length; i++) {
+  let temp = []
+  for (let i = 0; i < pageRoutes.length; i++) {
     if (route.path === pageRoutes[i].path) {
       return true
     }
@@ -73,8 +73,9 @@ function fnCurrentRouteIsPageRoute(route, pageRoutes = []) {
 /**
  * 添加动态(菜单)路由
  * @param menuList 菜单列表
+ * @param routes 动态菜单路由
  */
-function fnAddDynamicMenuRouters (menuList = []) {
+function fnAddDynamicMenuRouters (menuList = [], routes = []) {
   const temp = []
   for (let i = 0; i < menuList.length; i++) {
     // 父级菜单只是导航到子菜单,只有子菜单需要被添加到路由中
@@ -120,20 +121,41 @@ function fnAddDynamicMenuRouters (menuList = []) {
     if (param) {
       route.query = param
     }
-    // 添加动态菜单路由到主路由的children下
-    router.addRoute('main',route)
+    routes.push(route)
   }
   // 递归子菜单
   if (temp.length > 0){
     fnAddDynamicMenuRouters(temp)
   }
-  // 更新状态
-  window.APP_CONF.dynamicMenuRoutesHasAdded = true
+
+  // 加载动态菜单路由列表数据
+  window.APP_CONF.dynamicMenuRoutes = routes
+
+  //添加首页
+  routes.push({
+    path: '/home',
+    component: () => import('@/views/modules/home'),
+    name: 'home',
+    meta: {
+      title: '首页',
+      isTab: true
+    }
+  })
+  // 添加动态菜单路由到主路由的children下
+  router.addRoute({
+    ...moduleRoutes,
+    name: 'main-dynamic-menu',
+    children: routes
+  })
   // 404页面处理
   router.addRoute({
-    path: '/^*/',
-    redirect: { name: '404' }
+    // path: "/:pathMatch(.*)*" 相当于 path:'*'
+    path: "/:pathMatch(.*)*",
+    component: () => import('@/views/pages/404')
   })
+  // 更新状态
+  window.APP_CONF.dynamicMenuRoutesHasAdded = true
+
 }
 
 
