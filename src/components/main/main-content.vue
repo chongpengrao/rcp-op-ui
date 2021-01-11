@@ -1,29 +1,82 @@
 <template>
-    <main>
-        <a-layout :style="{ marginLeft: '200px' }">
-            <a-layout-header :style="{ background: '#fff', padding: 0 }">
-
-            </a-layout-header>
-            <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial' }">
-                <div :style="{ padding: '24px', background: '#fff', textAlign: 'center' }">
-                    <h1>main content</h1>
-                </div>
-            </a-layout-content>
-            <a-layout-footer :style="{ textAlign: 'center'}">
-                我自风情万种,与世无争  ©2021  Created by Scorpio.Rao
-            </a-layout-footer>
-        </a-layout>
-    </main>
+    <div :style="{ padding: '24px', background: '#fff', textAlign: 'center', height: '100%' }">
+        <a-table :columns="columns" :data-source="data">
+            <template #name="{text}">
+                <a>{{ text }}</a>
+            </template>
+        </a-table>
+    </div>
 </template>
 <script>
-export default {
-  data() {
-    return {
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      slots: { customRender: 'name' },
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+      width: 80,
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address 1',
+      ellipsis: true,
+    },
+    {
+      title: 'Long Column Long Column Long Column',
+      dataIndex: 'address',
+      key: 'address 2',
+      ellipsis: true,
+    },
+    {
+      title: 'Long Column Long Column',
+      dataIndex: 'address',
+      key: 'address 3',
+      ellipsis: true,
+    },
+    {
+      title: 'Long Column',
+      dataIndex: 'address',
+      key: 'address 4',
+      ellipsis: true,
+    },
+  ];
 
-    }
-  },
-  methods: {
+  const data = [
+    {
+      key: '1',
+      name: 'John Brown',
+      age: 32,
+      address: 'New York No. 1 Lake Park, New York No. 1 Lake Park',
+      tags: ['nice', 'developer'],
+    },
+    {
+      key: '2',
+      name: 'Jim Green',
+      age: 42,
+      address: 'London No. 2 Lake Park, London No. 2 Lake Park',
+      tags: ['loser'],
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park, Sidney No. 1 Lake Park',
+      tags: ['cool', 'teacher'],
+    },
+  ];
 
-  }
-}
+  export default {
+    data() {
+      return {
+        data,
+        columns,
+      };
+    },
+  };
 </script>
