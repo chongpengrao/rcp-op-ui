@@ -1,10 +1,7 @@
 <template>
     <!--侧边栏上部导航页面 - 点击可返回主页-->
-    <div class="logo" @click="$router.push({ name: 'home' })">
-        <h1 style="text-align: center;font-size: large">
-            <!--href="javascript:;" 点击标签时不执行任何操作-->
-            <a class="brand-large" href="javascript:;">OP权限管理系统</a>
-        </h1>
+    <div class="logo" @click="$router.push({ name: 'home' })" style="height: 49px; background: #1890ff; padding: 0; margin-top: 0;">
+        <h1 style="text-align: center; font-size: large; padding-top: 10px; color: #fff">OP权限管理系统</h1>
     </div>
     <div>
       <a-menu id="main_sidebar"

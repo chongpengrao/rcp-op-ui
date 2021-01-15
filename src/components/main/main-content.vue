@@ -1,82 +1,113 @@
 <template>
-    <div :style="{ padding: '24px', background: '#fff', textAlign: 'center', height: '100%' }">
-        <a-table :columns="columns" :data-source="data">
-            <template #name="{text}">
-                <a>{{ text }}</a>
+    <div :style="{ padding: '0 15px', background: '#fff', height: '100%' }">
+    <a-tabs v-model="activeKey" type="editable-card" hide-add
+            @tabClick="tabSelectedHandle"
+            @edit="onEdit">
+        <a-tab-pane v-for="pane in panes" :key="pane.key" :closable="pane.closable">
+            <template v-if="pane.title === 'home'" #tab>
+                <home-outlined />
             </template>
-        </a-table>
+            <template v-else #tab>
+                <span>{{pane.title}}</span>
+            </template>
+            {{ pane.content }}
+            <div v-if="pane.title === 'home'">
+                <router-view  v-slot="{ Component }">
+                    <keep-alive><component :is="Component" /></keep-alive>
+                </router-view>
+            </div>
+        </a-tab-pane>
+        <template #tabBarExtraContent>
+            <a-popconfirm
+                    title="确定关闭所有tab?"
+                    ok-text="确定"
+                    cancel-text="取消"
+                    @confirm="tabsCloseAllHandle">
+                <a href="#">
+                    <a-tooltip>
+                        <template #title>
+                            关闭全部
+                        </template>
+                        <CloseOutlined />
+                    </a-tooltip>
+                </a>
+            </a-popconfirm>
+        </template>
+    </a-tabs>
     </div>
 </template>
 <script>
-  const columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      slots: { customRender: 'name' },
-    },
-    {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age',
-      width: 80,
-    },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address 1',
-      ellipsis: true,
-    },
-    {
-      title: 'Long Column Long Column Long Column',
-      dataIndex: 'address',
-      key: 'address 2',
-      ellipsis: true,
-    },
-    {
-      title: 'Long Column Long Column',
-      dataIndex: 'address',
-      key: 'address 3',
-      ellipsis: true,
-    },
-    {
-      title: 'Long Column',
-      dataIndex: 'address',
-      key: 'address 4',
-      ellipsis: true,
-    },
+import { CloseOutlined,HomeOutlined } from '@ant-design/icons-vue'
+export default {
+data() {
+  const panes = [
+    { title: 'home', content: 'Content of Tab 1', key: '1', closable: false },
+    { title: 'Tab 2', content: 'Content of Tab 2', key: '2' },
+    { title: 'Tab 3', content: 'Content of Tab 3', key: '3' },
   ];
-
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park, New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 2 Lake Park, London No. 2 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park, Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-  ];
-
-  export default {
-    data() {
-      return {
-        data,
-        columns,
-      };
-    },
+  return {
+    activeKey: panes[0].key,
+    newTabIndex: 0,
+    panes
   };
+},
+components: {
+  CloseOutlined,
+  HomeOutlined
+},
+computed: {
+
+},
+methods: {
+  callback(key) {
+    console.log(key);
+  },
+  onEdit(targetKey, action) {
+    this[action](targetKey);
+  },
+  add() {
+    const panes = this.panes;
+    const activeKey = `newTab${this.newTabIndex++}`;
+    panes.push({ title: 'New Tab', content: 'Content of new Tab', key: activeKey });
+    this.panes = panes;
+    this.activeKey = activeKey;
+  },
+  remove(targetKey) {
+    let activeKey = this.activeKey;
+    let lastIndex;
+    this.panes.forEach((pane, i) => {
+      if (pane.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const panes = this.panes.filter(pane => pane.key !== targetKey);
+    if (panes.length && activeKey === targetKey) {
+      if (lastIndex >= 0) {
+        activeKey = panes[lastIndex].key;
+      } else {
+        activeKey = panes[0].key;
+      }
+    }
+    this.panes = panes;
+    this.activeKey = activeKey;
+  },
+  // tabs, 关闭全部
+  tabsCloseAllHandle () {
+    this.$store.state.contentTabs = this.$store.state.contentTabs.filter(item => item.name === 'home')
+    this.$router.push({ name: 'home' })
+  },
+  // tabs, 选中tab
+  tabSelectedHandle (tabKey) {
+    let tab = this.$store.state.contentTabs.filter(item => item.name === tabKey)[0]
+    if (tab) {
+      this.$store.state.contentTabsActiveName = tab.name
+      this.$router.push({
+        'name': tab.name,
+        'params': { ...tab.params },
+        'query': { ...tab.query }
+      })
+    }
+  }
+},
+};
 </script>
